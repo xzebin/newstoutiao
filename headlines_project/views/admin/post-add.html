@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <title>Add new post &laquo; Admin</title>
+  <link rel="stylesheet" href="/public/vendors/bootstrap/css/bootstrap.css">
+  <link rel="stylesheet" href="/public/vendors/font-awesome/css/font-awesome.css">
+  <link rel="stylesheet" href="/public/vendors/nprogress/nprogress.css">
+  <link rel="stylesheet" href="/public/css/admin.css">
+  <link rel="stylesheet" href="/public/layui/css/layui.css">
+  <script src="/public/vendors/nprogress/nprogress.js"></script>
+  
+</head>
+<body>
+  <script>NProgress.start()</script>
+
+  <div class="main">
+    {{ include "./navigation_bar.html" }}
+
+    <div class="container-fluid">
+      <div class="page-title">
+        <h1>写文章</h1>
+      </div>
+      <!-- 有错误信息时展示 -->
+      <!-- <div class="alert alert-danger">
+        <strong>错误！</strong>发生XXX错误
+      </div> -->
+      <form class="row" method="POST">
+        <div class="col-md-9">
+          <div class="form-group">
+            <label for="title">标题</label>
+            <input id="title" class="form-control input-lg" name="title" type="text" placeholder="文章标题">
+          </div>
+          <div class="form-group">
+            <label for="content">内容</label>
+            <textarea id="content" class="form-control input-lg" name="content" cols="30" rows="10" placeholder="内容"></textarea>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="form-group">
+            <label for="feature">特色图像</label>
+            <!-- show when image chose -->
+            <input type="hidden" id="imgUrlInput" name="imgurl">
+            <img class="help-block thumbnail" id="myImg" style="display: none">
+            <input id="feature" class="form-control" name="feature" type="file">
+          </div>
+          <div class="form-group">
+            <label for="category">所属分类</label>
+            <select id="category" class="form-control" name="category">
+              {{ each cateGoryName val index }}
+                <option value={{index+1}}>{{val.cat_name}}</option> 
+              {{ /each }}
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="created">发布时间</label>
+            <input id="created" class="form-control" name="created" type="text">
+          </div>
+          <div class="form-group">
+            <label for="status">状态</label>
+            <select id="status" class="form-control" name="status">
+              {{ each postsStatus val index }}
+                <option value={{val.key}}>{{val.value}}</option> 
+              {{ /each }}
+            </select>
+          </div>
+          <div class="form-group">
+            <button id="savePost" class="btn btn-primary" type="submit" onclick="return false">保存</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  {{ include "./sidebar.html" }}
+
+  <script src="/public/vendors/jquery/jquery.js"></script>
+  <script src="/public/vendors/bootstrap/js/bootstrap.js"></script>
+  <script src="/public/vendors/layer/layer.js"></script>
+  <link rel="stylesheet" href="/public/layui/css/layui.css">
+  <script src="/public/vendors/laydate/laydate.js"></script>
+  <script>NProgress.done()</script>
+</body>
+<script>
+
+  //执行一个laydate实例
+  laydate.render({
+    elem: '#created', //指定元素
+    type: "datetime"
+  });
+  $(function(){
+    //监听文件上传事件
+    $("#feature").change(function(){
+      let file = this.files[0];
+      //创建一个FormData对象，相当于一个空盒子，将二进制文件存放进去
+      let formData = new FormData();
+      formData.append("imgFile",file);
+      $.ajax({
+        url:"/uploadImg",
+        type:"post",
+        data:formData,
+        processData: false, // 将数据转换成对象，不对数据做处理，故 processData: false 
+  　　　contentType: false,    // 不设置数据类型
+      }).then((data)=>{
+        $("#imgUrlInput").attr("value",data.imgUrl);
+        $("#myImg").attr("src",data.imgUrl).show();
+      });
+    }); 
+    
+  
+    $("#savePost").click(function(){
+        let result = $("form").serialize();
+        console.log(result);
+        $.post("/savePost",result,function(data){
+          if(data.code==200){
+            location.href = "/getPostLis";
+            layer.msg(data.msg, {icon: data.icon});
+          }else{
+            layer.msg(data.msg, {icon: data.icon});
+          }
+        });
+    });
+
+
+    var lis = document.querySelectorAll(".aside ul li");
+    $(lis).removeClass();
+    lis[1].classList.add("active");
+    $(lis[1]).children().eq(1).removeClass("collapse");
+    $(lis[1]).children().eq(1).addClass("collapse in");
+  })
+</script>
+</html>

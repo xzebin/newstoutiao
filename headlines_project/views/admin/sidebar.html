@@ -1,0 +1,46 @@
+<!-- 抽离侧边栏 -->
+<div class="aside">
+    <div class="profile">
+      <img id="myImgUrl" class="avatar" src="">
+      <h3 class="name"></h3>
+    </div>
+    <ul class="nav">
+      <li class="active">
+        <a href="/index"><i class="fa fa-dashboard"></i>仪表盘</a>
+      </li>
+      <li>
+        <a href="#menu-posts" class="collapsed" data-toggle="collapse">
+          <i class="fa fa-thumb-tack"></i>文章<i class="fa fa-angle-right"></i>
+        </a>
+        <ul id="menu-posts" class="collapse">
+          <li><a href="/getPostLis" id="postLists">所有文章</a></li>
+          <li><a href="/getAddPost">写文章</a></li>
+          <li><a href="/splitCatalog">分类目录</a></li>
+        </ul>
+      </li>
+      <li>
+        <a href="/getCommentsLis"><i class="fa fa-comments"></i>评论</a>
+      </li>
+      <li>
+        <a href="/getUsers"><i class="fa fa-users"></i>用户</a>
+      </li>
+      <li>
+        <a href="#menu-settings" class="collapsed" data-toggle="collapse">
+          <i class="fa fa-cogs"></i>设置<i class="fa fa-angle-right"></i>
+        </a>
+        <ul id="menu-settings" class="collapse">
+          <li><a href="nav-menus.html">导航菜单</a></li>
+          <li><a href="/getSlidesHtml">图片轮播</a></li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+  <script src="/public/vendors/jquery/jquery.js"></script>
+  <script src="/public/vendors/nprogress/nprogress.js"></script>
+  <script>
+    $.get("/getSessionInfo",function(data){
+      $(".name").html(data.name);
+      $("#myImgUrl").attr("src",data.photo);
+    });
+  </script>
+  

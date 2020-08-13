@@ -1,0 +1,24 @@
+<!-- 抽离导航栏 -->
+<nav class="navbar">
+    <button class="btn btn-default navbar-btn fa fa-bars"></button>
+    <ul class="nav navbar-nav navbar-right">
+      <li><a href="/getProFile"><i class="fa fa-user"></i>个人中心</a></li>
+      <li id="loginOut"><a href="javaScript:;"><i class="fa fa-sign-out"></i>退出</a></li>
+    </ul>
+</nav>
+  
+  
+<script src="/public/vendors/jquery/jquery.js"></script>
+  <script src="/public/vendors/bootstrap/js/bootstrap.js"></script>
+  <script src="/public/vendors/layer/layer.js"></script>
+<script>
+  $("#loginOut").click(function(){
+    layer.confirm('确定退出吗？', {
+      btn: ['确定','取消'] //按钮
+    }, function(){
+      location.href = "/loginOut";
+    }, function(){
+      layer.msg('取消退出');
+    });
+  });
+</script>

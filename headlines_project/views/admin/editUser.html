@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <title>Dashboard &laquo; Admin</title>
+  <link rel="stylesheet" href="/public/vendors/bootstrap/css/bootstrap.css">
+  <link rel="stylesheet" href="/public/vendors/font-awesome/css/font-awesome.css">
+  <link rel="stylesheet" href="/public/vendors/nprogress/nprogress.css">
+  <link rel="stylesheet" href="/public/css/admin.css">
+  <script src="/public/vendors/nprogress/nprogress.js"></script>
+</head>
+<body>
+  <script>NProgress.start()</script>
+
+    <div class="container-fluid">
+      <div class="page-title">
+        <h1>我的个人资料</h1>
+      </div>
+      <form class="form-horizontal" onsubmit="return false">
+        <input type="hidden" name="userId" value="{{user_id}}">
+        <div class="form-group">
+            <label for="feature">头像</label>
+            <!-- show when image chose -->
+            <img class="help-block thumbnail" id="myImg" src='{{photo}}'>
+            <input id="feature" class="form-control" name="feature" type="file">
+        </div>
+        <div class="form-group">
+          <label for="email" class="col-sm-3 control-label">邮箱</label>
+          <div class="col-sm-6">
+            <input id="email" class="form-control" name="email" type="type" value="{{email}}" placeholder="邮箱" readonly>
+            <p id="emailErr" class="help-block" style="display: none;color: red;">登录邮箱不允许修改</p>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="nickname" class="col-sm-3 control-label">昵称</label>
+          <div class="col-sm-6">
+            <input id="nickname" class="form-control" name="nickname" type="type" value="{{nickname}}" placeholder="昵称" maxlength="16" minlength="2">
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="bio" class="col-sm-3 control-label">简介</label>
+          <div class="col-sm-6">
+            <textarea id="bio" name="intro" class="form-control" placeholder="Bio" cols="30" rows="6">{{intro}}</textarea>
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="col-sm-offset-3 col-sm-6">
+            <button id="editUserInfoBtn" type="submit" class="btn btn-primary">编辑</button>
+          </div>
+        </div>
+      </form>
+    </div>
+
+  <script src="/public/vendors/jquery/jquery.js"></script>
+  <script src="/public/vendors/bootstrap/js/bootstrap.js"></script>
+  <script src="/public/vendors/layer/layer.js"></script>
+  <script>NProgress.done()</script>
+</body>
+<script>
+    $("input[name='email']").click(function(){
+        $("#emailErr").show();
+    });
+    $("#feature").change(function(){
+        if(this.files.length == 0){
+            return ;
+        }
+        let file = this.files[0];
+        let formData = new FormData();
+        formData.append("imgFile",file);
+        $.ajax({
+            url:"/uploadImg",
+            type:"post",
+            data:formData,
+            processData: false, // 将数据转换成对象，不对数据做处理，故 processData: false 
+        　　contentType: false
+        }).then(data => {
+            $("#myImg").attr("src",data.imgUrl);
+        });
+    });
+
+
+    $("#editUserInfoBtn").click(function(){
+        $("#editUserInfoBtn").html("编辑中").prop("disabled",true);
+        let imgUrl = $("#myImg").attr("src");
+        let result = $("form").serialize();
+        result+=`&imgUrl=${imgUrl}`;
+        $.post("/editUser",result,function(data){
+        let {code,msg} = data;
+        if(code == 200){
+            layer.msg(msg,{icon:1,time:1000},function(){
+                $("#editUserInfoBtn").html("编辑").prop("disabled",false);
+                window.parent.location.reload();
+            });
+        }else{
+            layer.msg(msg,{icon:2});
+        }
+        })
+    });
+</script>
+</html>

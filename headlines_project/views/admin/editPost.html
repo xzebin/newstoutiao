@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <title>Add new post &laquo; Admin</title>
+  <link rel="stylesheet" href="/public/vendors/bootstrap/css/bootstrap.css">
+  <link rel="stylesheet" href="/public/vendors/font-awesome/css/font-awesome.css">
+  <link rel="stylesheet" href="/public/vendors/nprogress/nprogress.css">
+  <link rel="stylesheet" href="/public/css/admin.css">
+  <link rel="stylesheet" href="/public/layui/css/layui.css">
+  <script src="/public/vendors/nprogress/nprogress.js"></script>
+  
+</head>
+<body>
+  <script>NProgress.start()</script>
+
+    <div class="container-fluid">
+        <div class="page-title">
+        <h1>修改文章</h1>
+        </div>
+        <form class="row" method="POST" onsubmit="return false">
+            <div class="col-md-8">
+                <div class="form-group">
+                <input type="hidden" name="postId" value="{{data.post_id}}">
+                <label for="title">标题</label>
+                <input id="title" class="form-control input-lg" name="title" type="text" value={{data.title}} placeholder="文章标题" autocomplete="off">
+                </div>
+                <div class="form-group">
+                <label for="content">内容</label>
+                <textarea id="content" class="form-control input-lg" name="content" cols="30" rows="10" placeholder="内容">{{ data.content }}</textarea>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                <label for="feature">特色图像</label>
+                <!-- show when image chose -->
+                <input type="hidden" name="oldUrl" value='{{ data.feature }}'>
+                <img class="help-block thumbnail" id="myImg" src='{{ data.feature }}'>
+                <input id="feature" class="form-control" name="feature" type="file">
+                </div>
+                <div class="form-group">
+                <label for="category">所属分类</label>
+                <select id="category" class="form-control" name="category">
+                    {{ each data.categoryStatus val index }}
+                    <option value={{index+1}}>{{val.cat_name}}</option> 
+                    {{ /each }}
+                </select>
+                </div>
+                <div class="form-group">
+                <label for="created">发布时间</label>
+                <input id="created" class="form-control" name="created" value='{{data.created}}' type="text" autocomplete="off">
+                </div>
+                <div class="form-group">
+                <label for="status">状态</label>
+                <select id="status" class="form-control" name="status">
+                    {{ each data.postsStatus val index }}
+                    <option value={{val.key}}>{{val.value}}</option> 
+                    {{ /each }}
+                </select>
+                </div>
+                <div class="form-group">
+                <button id="editPostBtn" class="btn btn-primary" type="submit" onclick="return false">修改</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+  <script src="/public/vendors/jquery/jquery.js"></script>
+  <script src="/public/vendors/bootstrap/js/bootstrap.js"></script>
+  <script src="/public/vendors/layer/layer.js"></script>
+  <link rel="stylesheet" href="/public/layui/css/layui.css">
+  <script src="/public/vendors/moment/moment.js"></script>
+  <script src="/public/vendors/laydate/laydate.js"></script>
+  <script>NProgress.done()</script>
+</body>
+<script>
+  //执行一个laydate实例
+  laydate.render({
+    elem: '#created', //指定元素
+    type: "datetime"
+  });
+  $(function(){
+
+    $("#feature").change(function(){
+        let file = this.files[0];
+        let formData = new FormData();
+        formData.append("imgFile",file);
+        $.ajax({
+            url:"/uploadImg",
+            type:"post",
+            data:formData,
+            processData: false, // 将数据转换成对象，不对数据做处理，故 processData: false 
+        　　contentType: false
+        }).then(data => {
+            $("input[name='oldUrl']").val(data.imgUrl);
+            $("#myImg").attr("src",data.imgUrl);
+        });
+    });
+
+    $("#editPostBtn").click(function(){
+        let result = $("form").serializeArray();
+        result.forEach(e => {
+            if(e.value == ""){
+                layer.msg(e.name+"不能为空");
+                return;
+            }
+        });
+        let r = $("form").serialize();
+        $.post("/editPost",r,function(data){
+            if(data.code == 200){
+                layer.msg(data.msg,{icon: data.icon,time:1000},()=>{
+                    //重新刷新父页面
+                    window.parent.location.reload();
+                });
+                
+            }else{
+                layer.msg(data.msg,{icon: data.icon});
+            }
+        },"json");
+    })
+  }); 
+    
+</script>
+</html>

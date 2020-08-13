@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <title>Slides &laquo; Admin</title>
+  <link rel="stylesheet" href="/public/vendors/bootstrap/css/bootstrap.css">
+  <link rel="stylesheet" href="/public/vendors/font-awesome/css/font-awesome.css">
+  <link rel="stylesheet" href="/public/vendors/nprogress/nprogress.css">
+  <link rel="stylesheet" href="/public/css/admin.css">
+  <script src="/public/vendors/nprogress/nprogress.js"></script>
+ 
+</head>
+<body>
+  <script>NProgress.start()</script>
+
+  <div class="main">
+    {{ include "./navigation_bar.html" }}
+
+    <div class="container-fluid">
+      <div class="page-title">
+        <h1>图片轮播</h1>
+      </div>
+      <div class="row">
+        <div class="col-md-4">
+          <form onsubmit="return false">
+            <h2>添加新轮播内容</h2>
+            <div class="form-group">
+              <label class="col-sm-3 control-label">轮播图</label>
+              <div class="col-sm-9">
+                <label class="form-image">
+                  <input id="avatar" type="file">
+                  <img id="swipeImg" src="/public/img/default.png">
+                  <i class="mask fa fa-upload"></i>
+                </label>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="text">文本</label>
+              <input id="text" class="form-control" name="text" type="text" placeholder="文本">
+            </div>
+            <div class="form-group">
+              <label for="link">链接</label>
+              <input id="link" class="form-control" name="link" type="text" placeholder="链接">
+            </div>
+            <div class="form-group">
+              <button id="addSwipe" class="btn btn-primary" type="submit">添加</button>
+            </div>
+          </form>
+        </div>
+        <div class="col-md-8">
+          <div class="page-action">
+            <!-- show when multiple checked -->
+            <a class="btn btn-danger btn-sm" href="javascript:;" style="display: none">批量删除</a>
+          </div>
+          <table class="table table-striped table-bordered table-hover">
+            <thead>
+              <tr>
+                <th class="text-center" width="40"><input type="checkbox"></th>
+                <th class="text-center">图片</th>
+                <th>文本</th>
+                <th>链接</th>
+                <th class="text-center" width="100">操作</th>
+              </tr>
+            </thead>
+            <tbody>
+              
+            </tbody>
+          </table>
+          <div class="box" style="display: none;text-align: center;">
+              
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {{ include "./sidebar.html" }}
+
+  <script src="/public/vendors/jquery/jquery.js"></script>
+  <script src="/public/vendors/bootstrap/js/bootstrap.js"></script>
+  <script src="/public/vendors/twbs-pagination/jquery.twbsPagination.js"></script>
+  <script src="/public/vendors/layer/layer.js"></script>
+  <script src="/public/vendors/moment/moment.js"></script>
+  <script>NProgress.done()</script>
+</body>
+<script>
+  $.get("/getSwipes",function(data){
+    if(data.length != 0){
+      let result = ``;
+      data.forEach(element => {
+        result += `
+                    <tr>
+                      <td class="text-center"><input type="checkbox"></td>
+                      <td class="text-center"><img class="slide" src="${element.img}"></td>
+                      <td>${element.text}</td>
+                      <td>${element.link}</td>
+                      <td class="text-center">
+                        <a href="javascript:;" class="btn btn-danger btn-xs">删除</a>
+                      </td>
+                    </tr>
+                  `;
+      });
+      $("tbody").html(result);
+    }else{
+      $(".box").html("没有数据").show();
+    }
+  });
+
+  $("#addSwipe").click(function(){
+    alert(1231232123);
+  });
+  $("#avatar").change(function(){
+    console.log(123123123);
+    let file = this.files[0];
+    let formData = new FormData();
+    formData.append("imgFile",file);
+    $.ajax({
+      url:"/uploadImg",
+      type:"post",
+      data:formData,
+      processData: false,  
+  　　contentType: false
+    }).then(data => {
+      console.log(data.imgUrl);
+      $("#swipeImg").attr("src",data.imgUrl);
+    });
+  });
+</script>
+</html>

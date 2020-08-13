@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/public/vendors/bootstrap/css/bootstrap.css">
+    <link rel="stylesheet" href="/public/vendors/font-awesome/css/font-awesome.css">
+    <link rel="stylesheet" href="/public/vendors/nprogress/nprogress.css">
+    <link rel="stylesheet" href="/public/css/admin.css">
+    <script src="/public/vendors/nprogress/nprogress.js"></script>
+    <title>Document</title>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+        <div class="col-md-12">
+            <form onsubmit="return false">
+                <h2>编辑分类信息</h2>
+                <input type="hidden" name="catId" value="{{cat_id}}">
+                <div class="form-group">
+                    <label for="name">名称</label>
+                    <input id="name" class="form-control" name="name" type="text" placeholder="分类名称" value="{{cat_name}}" required>
+                </div>
+                <div class="form-group">
+                    <label for="slug">类名</label>
+                    <input id="slug" class="form-control" name="classname" type="text" value="{{classname}}" placeholder="classname" required>
+                </div>
+                <div class="form-group">
+                    <button id="editCgsBtn" class="btn btn-primary" type="submit">编辑</button>
+                </div>
+            </form>
+        </div>
+        </div>
+    </div>
+</body>
+<script src="/public/vendors/jquery/jquery.js"></script>
+<script src="/public/vendors/bootstrap/js/bootstrap.js"></script>
+<script src="/public/vendors/layer/layer.js"></script>
+
+<script>
+    $("#editCgsBtn").click(function(){
+        let catName = $.trim( $("input[name='name']").val() );
+        let classname = $.trim( $("input[name='classname']").val() );
+        if(catName == ""){
+            layer.msg("分类名称不能为空！！！");
+            $("input[name='name']").focus();
+            return;
+        }
+        if(classname == ""){
+            layer.msg("classname不能为空！！！");
+            $("input[name='classname']").focus();
+            return;
+        }
+        let result = $("form").serialize();
+        $.post("/editCateGories",result,function(data){
+            let {code,msg} = data;
+            if(code == 200){
+                layer.msg(msg,{icon:1,time:1000},function(){
+                    window.parent.location.reload();
+                });
+            }else{
+                layer.msg(msg,{icon:2});
+            }
+        });
+    });
+</script>
+</html>
